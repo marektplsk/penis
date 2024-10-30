@@ -20,6 +20,7 @@ class WinController extends Controller
         $possibleSessions = ['NY AM', 'London', 'NY PM', 'Other', 'Asian'];
         $sessionCounts = $wins->groupBy('hour_session')->map->count();
 
+
         $sessionData = [];
         foreach ($possibleSessions as $session) {
             $sessionData[$session] = $sessionCounts->get($session, 0);
@@ -27,7 +28,14 @@ class WinController extends Controller
 
         \Log::info($sessionData); // Log sessionCounts to see the output
 
-        return view('app', compact('wins', 'chartData', 'sessionData')); // Pass data to the view
+
+        $breadcrumbs = [
+            ['name' => 'Home', 'url' => ''], // Home will be the current page, no URL needed
+        ];
+    
+
+
+        return view('app', compact('wins', 'chartData', 'sessionData', 'breadcrumbs')); // Pass data to the view
     }
 
     // Store a new win record
@@ -103,6 +111,49 @@ class WinController extends Controller
     return redirect()->route('app.index')->with('success', 'Record deleted successfully.'); // Redirect with success message
     }
     
+    public function dashboard()
+        {
+        $wins = WinModel::all(); // Fetch all wins for the dashboard
 
+        $breadcrumbs = [
+            ['name' => 'Home', 'url' => route('app.index')],
+            ['name' => 'Dashboard', 'url' => ''] // No trade ID here
+        ];
+
+
+
+
+        return view('dashboard.dashboard', compact('wins', 'breadcrumbs', ));
+    }
     
+    public function show($id)
+    {
+     // Fetch the trade details
+    $win = WinModel::findOrFail($id);
+
+    // Initialize breadcrumbs
+    $breadcrumbs = [];
+
+    // Add Home breadcrumb
+    $breadcrumbs[] = ['name' => 'Home', 'url' => route('app.index')];
+
+    // Add Dashboard breadcrumb
+    if (session('previous_route') === 'dashboard') {
+        $breadcrumbs[] = ['name' => 'Dashboard', 'url' => route('dashboard')];
+    }
+
+    // Add current trade
+    $currentRoute = ['name' => 'Trade ' . $win->id, 'url' => route('dashboard.show', ['id' => $win->id])];
+    $breadcrumbs[] = $currentRoute;
+
+    // Save the current route in session for navigation
+    session(['previous_route' => request('from')]);
+
+    // Return the view with the win details and breadcrumbs
+
+    return view('dashboard.show', compact('win', 'breadcrumbs', ));
+        
+    }
+    
+        
 }

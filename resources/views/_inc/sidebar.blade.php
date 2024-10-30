@@ -1,10 +1,12 @@
+<!-- sidebar.blade.php -->
 <div class="sidebar p-4">
     <h1 class="text-lg font-bold">My Application</h1>
     <ul class="mt-4">
-        <li><a href="#" class="block py-2 px-4 hover:bg-gray-200">Home</a></li>
-        <li><a href="#" class="block py-2 px-4 hover:bg-gray-200">Profile</a></li>
-        <li><a href="#" class="block py-2 px-4 hover:bg-gray-200">Settings</a></li>
-        <li><a href="#" class="block py-2 px-4 hover:bg-gray-200">Logout</a></li>
+        <li><a href=" {{ route('app.index')}}" class="block py-2 px-4 hover:bg-gray-200">Home</a></li>
+        <li><a href=" {{ route('dashboard') }}" class="block py-2 px-4 hover:bg-gray-200">Dashboard</a></li>
+        <li><a href="" class="block py-2 px-4 hover:bg-gray-200">Search</a></li>
+        <li><a href="" class="block py-2 px-4 hover:bg-gray-200">Portfolio</a></li>
+        
     </ul>
 </div>
 

@@ -14,3 +14,11 @@ Route::post('/app', [WinController::class, 'store'])->name('app.store');
 
 // Use resource routing for wins, which includes index, create, store, show, edit, update, destroy
 Route::resource('wins', WinController::class);
+
+Route::get('/dashboard', [WinController::class, 'dashboard'])->name('dashboard'); // Main dashboard page
+Route::get('/dashboard/{id}', [WinController::class, 'show'])->name('dashboard.show'); // Show details for a specific entry
+Route::get('/wins/{id}', [WinController::class, 'show'])->name('dashboard.show');
+Route::get('/dashboard/wins/{id}', [WinController::class, 'show'])->name('dashboard.show');
+
+
+Route::get('/search', [SearchController::class, 'search'])->name('search'); // Define the route name if needed

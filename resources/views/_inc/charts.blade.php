@@ -17,7 +17,7 @@
         <canvas id="riskRewardChart" width="200" height="200"></canvas>
     </div>
 
-    <div class="">
+    <div class="4">
             <h2 class="text-lg font-semibold mb-2 text-center">Trading Sessions</h2>
             <canvas id="sessionChart" width="300" height="300"></canvas>
     </div>
