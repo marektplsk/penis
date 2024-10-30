@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WinController;
+use App\Http\Controllers\SearchController; 
 
 // Redirect root URL to the app index
 Route::get('/', function () {
@@ -21,4 +22,4 @@ Route::get('/wins/{id}', [WinController::class, 'show'])->name('dashboard.show')
 Route::get('/dashboard/wins/{id}', [WinController::class, 'show'])->name('dashboard.show');
 
 
-Route::get('/search', [SearchController::class, 'search'])->name('search'); // Define the route name if needed
+Route::get('/search', [SearchController::class, 'search'])->name('search');

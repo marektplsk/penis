@@ -28,7 +28,7 @@
         </div>
 
         <!-- Include the search bar -->
-        @include('searchbar')
+        @include('search.searchbar')
 
     </div>
 </body>
