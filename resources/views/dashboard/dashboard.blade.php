@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha384-O8Yy7xwAkT0n2hoYB8PB3zrV7syT/0J27JX30I6lf3D9s9huVfg6UWxgT+AkY6r8" crossorigin="anonymous">
+
     <style>
         #success-message {
             transition: opacity 0.5s ease;
@@ -25,6 +27,7 @@
     </script>
 </head>
 <body class="flex flex-col items-center">
+  <!-- Include breadcrumbs here -->
     <div class="container mx-auto p-4">
         <div id="success-message" class="bg-green-500 text-white p-4 rounded mb-4" style="{{ session('success') ? '' : 'display:none;' }}">
             {{ session('success') }}
@@ -73,7 +76,10 @@
 
         <!-- Include the search bar -->
         @include('search.searchbar')
-
+        <i class="fas fa-newspaper"></i>
+<i class="fas fa-file-alt"></i>
     </div>
 </body>
+
+
 </html>

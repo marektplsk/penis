@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WinController;
 use App\Http\Controllers\SearchController; 
+use App\Http\Controllers\PortfolioController;
 
 // Redirect root URL to the app index
 Route::get('/', function () {
@@ -23,3 +24,10 @@ Route::get('/dashboard/wins/{id}', [WinController::class, 'show'])->name('dashbo
 
 
 Route::get('/search', [SearchController::class, 'search'])->name('search');
+
+Route::get('/portfolio', [PortfolioController::class, 'index'])->name('portfolio.index');
+Route::post('/portfolio', [PortfolioController::class, 'store'])->name('portfolio.store');
+
+Route::delete('/portfolio/{id}', [PortfolioController::class, 'destroy'])->name('portfolio.destroy');
+
+

@@ -60,27 +60,45 @@
     <!-- Chart Scripts -->
     <script>
         // Sample data for Portfolio Chart
-        const portfolioData = {
-            labels: ['Investment 1', 'Investment 2', 'Investment 3', 'Investment 4'],
-            datasets: [{
-                label: 'Portfolio Value ($)',
-                data: [5000, 15000, 10000, 25000], // Replace with your real portfolio data
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1,
-            }]
-        };
+        const portfolioLabels = @json($portfolioLabels);
+const portfolioValues = @json($portfolioValues);
 
-        const portfolioConfig = {
-            type: 'doughnut',
-            data: portfolioData,
-            options: {}
-        };
+const portfolioData = {
+    labels: portfolioLabels,
+    datasets: [{
+        label: 'Portfolio Value ($)',
+        data: portfolioValues,
+        backgroundColor: [
+            'rgba(75, 192, 192, 0.2)',  // Light green
+            'rgba(255, 99, 132, 0.2)',  // Light red
+            'rgba(54, 162, 235, 0.2)',  // Light blue
+            'rgba(255, 206, 86, 0.2)',  // Light yellow
+            'rgba(153, 102, 255, 0.2)', // Light purple
+            'rgba(255, 159, 64, 0.2)'   // Light orange
+        ],
+        borderColor: [
+            'rgba(75, 192, 192, 1)',
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 159, 64, 1)'
+        ],
+        borderWidth: 1,
+    }]
+};
 
-        const portfolioChart = new Chart(
-            document.getElementById('portfolioChart'),
-            portfolioConfig
-        );
+const portfolioConfig = {
+    type: 'doughnut',
+    data: portfolioData,
+    options: {}
+};
+
+const portfolioChart = new Chart(
+    document.getElementById('portfolioChart'),
+    portfolioConfig
+);
+
 
         // Win Rate Chart Data
         const winCount = {{ $wins->where('is_win', 1)->count() }};

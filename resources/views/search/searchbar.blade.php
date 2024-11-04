@@ -23,6 +23,7 @@ input {
     color: transparent; /* Hide the text color */
     text-shadow: 0 0 0 black; /* Keep the text visible */
     font-size: 16px; /* Font size for input text */
+    position: relative;
 }
 
 /* Highlight selected text */
@@ -36,6 +37,15 @@ input:focus {
     border-color: rgba(251, 191, 36, 0.5); /* Border color on focus */
 }
 
+/* Highlight the filled-in portion */
+input::after {
+    content: attr(data-highlight);
+    color: rgba(251, 191, 36, 0.5); /* Highlight color */
+    position: absolute;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+}
 /* Search results styles */
 #searchResults {
     max-height: 300px; /* Limit the height of results */
@@ -71,7 +81,13 @@ input:focus {
 }
 </style>
 
+<!-- HTML structure and styles remain the same -->
+
+
+
 <script>
+let currentIndex = -1; // Track the selected result
+
 // Toggle the search modal visibility
 function toggleSearch() {
     const modal = document.getElementById('searchModal');
@@ -97,87 +113,138 @@ function closeSearch() {
     document.getElementById('searchModal').classList.add('hidden');
     document.getElementById('searchInput').value = ''; // Clear input on close
     document.getElementById('searchResults').innerHTML = ''; // Clear search results
+    currentIndex = -1; // Reset index
 }
 
 // Perform the search query
 async function performSearch(query) {
-    // Allow for 2 characters instead of 3
     if (query.length < 2) {
         document.getElementById('searchResults').innerHTML = ''; // Clear if less than 2 chars
         return;
     }
 
     try {
-        const response = await fetch(`/search?q=${encodeURIComponent(query)}`); // Encode the query
+        const response = await fetch(`/search?q=${encodeURIComponent(query)}`);
         if (!response.ok) {
             throw new Error("Network response was not ok");
         }
         const results = await response.json();
-        displaySearchResults(results, query); // Pass query for highlighting
+        displaySearchResults(results, query);
     } catch (error) {
         console.error("Search failed:", error);
         document.getElementById('searchResults').innerHTML = '<p class="text-red-500">An error occurred while searching. Please try again.</p>';
     }
 }
 
-// Update the input field with highlighted suggestion
+// Update input with highlighted suggestion
 function updateInputWithHighlight(query, suggestion) {
     const input = document.getElementById('searchInput');
-
-    // Allow the user to clear the input completely
-    if (query.length === 0) {
-        input.value = ''; // Clear the input if query is empty
+    if (query.length === 0 || !suggestion) {
+        input.value = query;
+        input.setAttribute('data-highlight', '');
         return;
     }
 
     if (suggestion.toLowerCase().startsWith(query.toLowerCase())) {
-        const remainingText = suggestion.slice(query.length); // Get the remaining part of the suggestion
-        input.value = query + remainingText; // Set the input value to the query plus remaining text
-        // Set selection range for highlighting effect
+        const remainingText = suggestion.slice(query.length);
+        input.value = query + remainingText;
         input.setSelectionRange(query.length, input.value.length);
+        input.setAttribute('data-highlight', remainingText);
     } else {
-        input.value = query; // If no suggestion, just show the query
-        input.setSelectionRange(query.length, query.length); // Reset selection
+        input.value = query;
+        input.setAttribute('data-highlight', '');
     }
 }
 
-// Display search results with icons
+// Display search results in categories
 function displaySearchResults(results, query) {
     const resultsContainer = document.getElementById('searchResults');
-    resultsContainer.innerHTML = ''; // Clear previous results
+    resultsContainer.innerHTML = '';
+
+    currentIndex = -1; // Reset index when new results are shown
 
     if (results.length === 0) {
         resultsContainer.innerHTML = '<p class="text-gray-500">No results found</p>';
-        // Update input to show just the query since there are no results
-        const input = document.getElementById('searchInput');
-        input.value = query; // Ensure input shows the current query
-        input.setSelectionRange(query.length, query.length); // Reset selection
         return;
     }
 
-    // Populate the results with clickable items
-    results.forEach(result => {
-        const resultItem = document.createElement('div');
-        resultItem.classList.add('p-2', 'border-b', 'border-gray-200', 'hover:bg-gray-100', 'cursor-pointer');
+    // Group results by type (e.g., Pages, Trades)
+    const groupedResults = {
+        "Pages": results.filter(result => result.type === 'container-title'),
+        "Trades": results.filter(result => result.type === 'win-description')
+    };
 
-        // Add icons based on result type
-        let icon = '';
-        if (result.type === 'container-title') {
-            icon = '<i class="fas fa-newspaper text-blue-600 mr-2"></i>'; // Example for container title
-        } else if (result.type === 'win-description') {
-            icon = '<i class="fas fa-file-alt text-green-600 mr-2"></i>'; // Example for win description
-        }
+    Object.keys(groupedResults).forEach(section => {
+        const sectionHeader = document.createElement('div');
+        sectionHeader.classList.add('font-semibold', 'text-gray-700', 'mt-4', 'mb-2');
+        sectionHeader.innerText = section;
+        resultsContainer.appendChild(sectionHeader);
 
-        // Set the click handler for the result item
-        resultItem.innerHTML = `<a href="${result.url}" class="text-blue-600 hover:underline">${icon} ${escapeHtml(result.title)}</a>`;
-        resultItem.onclick = () => {
-            document.getElementById('searchInput').value = result.title; // Update input with selected title
-            closeSearch(); // Optionally close the search modal
-        };
-        
-        resultsContainer.appendChild(resultItem);
+        groupedResults[section].forEach(result => {
+            const resultItem = document.createElement('div');
+            resultItem.classList.add('p-2', 'border-b', 'border-gray-200', 'hover:bg-gray-100', 'cursor-pointer', 'result-item');
+
+            let icon = '';
+            if (section === "Pages") {
+                icon = '<i class="fas fa-newspaper text-blue-600 mr-2"></i>';
+            } else if (section === "Trades") {
+                icon = '<i class="fas fa-file-alt text-green-600 mr-2"></i>';
+            }
+
+            resultItem.innerHTML = `<a href="${result.url}" class="text-blue-600 hover:underline">${icon} ${escapeHtml(result.title)}</a>`;
+            resultItem.onclick = () => {
+                updateInputWithHighlight(query, result.title);
+                closeSearch();
+            };
+
+            resultsContainer.appendChild(resultItem);
+        });
     });
+
+    // Autocomplete and highlight the first result
+    if (results.length > 0) {
+        updateInputWithHighlight(query, results[0].title);
+    }
 }
+
+// Select a result by index
+function selectResult(index) {
+    const items = document.querySelectorAll('.result-item');
+    items.forEach((item, i) => {
+        item.classList.toggle('bg-gray-100', i === index);
+    });
+    currentIndex = index;
+
+    if (currentIndex >= 0) {
+        const selectedItem = items[currentIndex].querySelector('a');
+        document.getElementById('searchInput').value = selectedItem.textContent;
+    }
+}
+
+// Capture arrow key navigation and Enter selection
+document.getElementById('searchInput').addEventListener('keydown', function(event) {
+    const items = document.querySelectorAll('.result-item');
+
+    if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        currentIndex = (currentIndex + 1) % items.length; // Navigate down
+        selectResult(currentIndex);
+    } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        currentIndex = (currentIndex - 1 + items.length) % items.length; // Navigate up
+        selectResult(currentIndex);
+    } else if (event.key === 'Enter') {
+        event.preventDefault();
+        // If there are results and none is selected, select the first item
+        if (items.length > 0) {
+            if (currentIndex === -1) {
+                currentIndex = 0; // Always select the first item on Enter if none is selected
+            }
+            selectResult(currentIndex);
+            items[currentIndex].click(); // Click the selected item
+        }
+    }
+});
 
 // Escape HTML characters for safety
 function escapeHtml(unsafe) {
@@ -189,9 +256,23 @@ function escapeHtml(unsafe) {
         .replace(/'/g, "&#039;");
 }
 
-// Add event listener to the input for capturing input changes
+// Perform search when input changes
 document.getElementById('searchInput').addEventListener('input', function(event) {
-    const query = this.value; // Get current value of input
-    performSearch(query); // Perform search with current input value
+    const query = this.value;
+    const highlight = this.getAttribute('data-highlight');
+
+    // If the user is deleting characters, clear the highlight
+    if (event.inputType === 'deleteContentBackward' || event.inputType === 'deleteContentForward') {
+        this.setAttribute('data-highlight', '');
+    } else {
+        performSearch(query);
+    }
 });
 </script>
+    
+    <style>
+    .result-item.bg-gray-100 {
+        background-color: rgba(251, 191, 36, 0.3); /* Highlight color for selected result */
+    }
+    </style>
+    
