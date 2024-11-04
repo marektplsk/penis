@@ -163,4 +163,27 @@ class WinController extends Controller
         // Return the view with the win details and breadcrumbs
         return view('dashboard.show', compact('win', 'breadcrumbs'));
     }
+            public function edit($id)
+        {
+            $win = WinModel::findOrFail($id); // Fetch the specific win record
+            return view('dashboard.edit', compact('win')); // Render the edit view with the win record
+        }
+
+        public function update(Request $request, $id)
+        {
+            // Validate the request data
+            $data = $request->validate([
+                'description' => 'required|string|max:255',
+                'is_win' => 'required|boolean',
+                'risk' => 'required|numeric|min:0',
+                'risk_reward_ratio' => 'required|numeric|min:0',
+                'hour_session' => 'required|string|max:50',
+            ]);
+
+            // Update the win record
+            $win = WinModel::findOrFail($id);
+            $win->update($data);
+
+            return redirect()->route('app.index')->with('success', 'Trade updated successfully.');
+        }
 }

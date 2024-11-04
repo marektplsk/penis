@@ -32,4 +32,5 @@ class PortfolioController extends Controller
         // Redirect back to the portfolio page
         return redirect()->route('portfolio.index')->with('success', 'Portfolio item added successfully.');
     }
+    
 }

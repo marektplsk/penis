@@ -21,5 +21,6 @@ class CreateWinsTable extends Migration
     public function down()
     {
         Schema::dropIfExists('wins');
+
     }
 }

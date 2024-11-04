@@ -60,4 +60,29 @@ class PortfolioController extends Controller
     return redirect()->route('portfolio.index')->with('success', 'Portfolio item deleted successfully.');
     }
 
+    public function edit($id)
+    {
+    $portfolio = Portfolio::findOrFail($id); // Find the portfolio by ID
+    return view('portfolio.edit', compact('portfolio')); // Return the edit view with the portfolio data
+    }
+
+    // Update the specified portfolio in storage
+    public function update(Request $request, $id)
+    {
+    // Validate incoming request data
+    $request->validate([
+        'amount' => 'required|numeric',
+        'type' => 'required|string|max:255',
+    ]);
+
+    // Find the portfolio entry by ID and update it
+    $portfolio = Portfolio::findOrFail($id);
+    $portfolio->update([
+        'amount' => $request->amount,
+        'type' => $request->type,
+    ]);
+
+    // Redirect back to the portfolio page with a success message
+    return redirect()->route('portfolio.index')->with('success', 'Portfolio item updated successfully.');
+    }
 }

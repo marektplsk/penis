@@ -276,3 +276,6 @@ document.getElementById('searchInput').addEventListener('input', function(event)
     }
     </style>
     
+
+    <!-- Filtrovanie cez ine pages a nie len cez /home (app) --> 
+    

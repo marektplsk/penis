@@ -26,7 +26,8 @@
         });
     </script>
 </head>
-<body class="flex flex-col items-center">
+<body class="flex items-start">
+    @include('_inc.sidebar')
   <!-- Include breadcrumbs here -->
     <div class="container mx-auto p-4">
         <div id="success-message" class="bg-green-500 text-white p-4 rounded mb-4" style="{{ session('success') ? '' : 'display:none;' }}">

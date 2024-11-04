@@ -43,12 +43,16 @@
         </div>
 
         <h2 class="text-xl font-semibold mt-6">Portfolio Items</h2>
-            <ul id="portfolioList" class="mt-4">
-                @foreach($portfolios as $portfolio)
-                    <li class="bg-gray-200 p-4 mb-2 rounded-md flex justify-between items-center">
-                        <span>
-                            Amount: ${{ number_format($portfolio->amount, 2) }} | Type: {{ $portfolio->type }}
-                        </span>
+        <ul id="portfolioList" class="mt-4">
+            @foreach($portfolios as $portfolio)
+                <li class="bg-gray-200 p-4 mb-2 rounded-md flex justify-between items-center">
+                    <span>
+                        Amount: ${{ number_format($portfolio->amount, 2) }} | Type: {{ $portfolio->type }}
+                    </span>
+                    <div class="flex items-center">
+                        <a href="{{ route('portfolio.edit', $portfolio->id) }}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded mr-4">
+                            Edit
+                        </a>
                         <form action="{{ route('portfolio.destroy', $portfolio->id) }}" method="POST" class="ml-4">
                             @csrf
                             @method('DELETE') <!-- Specify the DELETE method -->
@@ -56,9 +60,10 @@
                                 X
                             </button>
                         </form>
-                    </li>
-                @endforeach
-            </ul>
+                    </div>
+                </li>
+            @endforeach
+        </ul>
 
         <!-- Portfolio Chart -->
         <div class="mt-6">
