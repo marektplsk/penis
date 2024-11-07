@@ -1,24 +1,29 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\WinModel; // Ensure this model is correctly defined
+use App\Models\WinModel;
 use Illuminate\Support\Facades\DB;
 use App\Models\Portfolio;
+use Illuminate\Support\Facades\Auth;
 
 class WinController extends Controller
 {
+    // Apply the auth middleware only to the 'store' method
+
     // Display the list of wins
     public function index()
     {
-        $wins = WinModel::all();
+        // Get only the wins related to the authenticated user
+        $wins = WinModel::where('user_id', Auth::id())->get();
+
+        // Initialize chart data
         $chartData = session('chartData', [
             'winPoints' => 0,
             'lossPoints' => 0,
         ]);
 
-        // New session data processing
+        // Process session data
         $possibleSessions = ['NY AM', 'London', 'NY PM', 'Other', 'Asian'];
         $sessionCounts = $wins->groupBy('hour_session')->map->count();
 
@@ -27,30 +32,21 @@ class WinController extends Controller
             $sessionData[$session] = $sessionCounts->get($session, 0);
         }
 
-        \Log::info($sessionData); // Log sessionCounts to see the output
-
         $breadcrumbs = [
-            ['name' => 'Home', 'url' => ''], // Home will be the current page, no URL needed
+            ['name' => 'Home', 'url' => ''],
         ];
 
         // Fetch portfolio data
-        $portfolios = Portfolio::all(); // Retrieve all portfolios
-
-        // Check if portfolios are fetched
+        $portfolios = Portfolio::all();
         if ($portfolios->isEmpty()) {
-            \Log::info('No portfolios found'); // Log if no portfolios
             $portfolioLabels = [];
             $portfolioValues = [];
         } else {
-            $portfolioLabels = $portfolios->pluck('type')->toArray(); // Get labels from portfolio
-            $portfolioValues = $portfolios->pluck('amount')->toArray(); // Get values from portfolio
-            
-            // Log the portfolio labels and values
-            \Log::info('Portfolio Labels: ', $portfolioLabels);
-            \Log::info('Portfolio Values: ', $portfolioValues);
+            $portfolioLabels = $portfolios->pluck('type')->toArray();
+            $portfolioValues = $portfolios->pluck('amount')->toArray();
         }
 
-        return view('app', compact('wins', 'chartData', 'sessionData', 'breadcrumbs', 'portfolioLabels', 'portfolioValues')); // Pass data to the view
+        return view('app', compact('wins', 'chartData', 'sessionData', 'breadcrumbs', 'portfolioLabels', 'portfolioValues'));
     }
 
     // Store a new win record
@@ -62,39 +58,47 @@ class WinController extends Controller
             'is_win' => 'required|boolean',
             'risk' => 'required|numeric|min:0',
             'risk_reward_ratio' => 'required|numeric|min:0',
-            'hour_session' => 'required|string|max:50', // Validate hour_session
+            'hour_session' => 'required|string|max:50',
         ]);
 
-        // Create a new win record using the validated data
-        WinModel::create([
-            'description' => $data['description'],
-            'is_win' => $data['is_win'],
-            'risk' => $data['risk'],
-            'risk_reward_ratio' => $data['risk_reward_ratio'],
-            'created_at' => now(),
-            'updated_at' => now(),
-            'hour_session' => $data['hour_session'],
-        ]);
+        // Check if the user is authenticated
+        if (Auth::check()) {
+            // Create a new win record including user_id
+            WinModel::create([
+                'description' => $data['description'],
+                'is_win' => $data['is_win'],
+                'risk' => $data['risk'],
+                'risk_reward_ratio' => $data['risk_reward_ratio'],
+                'hour_session' => $data['hour_session'],
+                'user_id' => Auth::id(), // Add user_id explicitly
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
 
-        return redirect()->route('app.index'); // Redirect to the index page after storing
+            // Redirect to the index page after storing
+            return redirect()->route('app.index');
+        } else {
+            // Handle the case when the user is not authenticated
+            return redirect()->route('login')->withErrors('You must be logged in to create a win record.');
+        }
     }
 
     // Calculate win and loss points for chart data
     private function calculateChartData()
     {
-        $wins = WinModel::all(); // Fetch all wins from the database
+        // Only get the wins related to the authenticated user
+        $wins = WinModel::where('user_id', Auth::id())->get();
         $winPoints = 0;
         $lossPoints = 0;
 
-        // Calculate win and loss points
         foreach ($wins as $trade) {
             $risk = $trade->risk;
             $rewardRatio = $trade->risk_reward_ratio;
 
             if ($trade->is_win) {
-                $winPoints += $risk * $rewardRatio; // Calculate win points
+                $winPoints += $risk * $rewardRatio;
             } else {
-                $lossPoints += $risk; // Calculate loss points
+                $lossPoints += $risk;
             }
         }
 
@@ -107,7 +111,7 @@ class WinController extends Controller
     // Delete a win record and log it in win_history
     public function destroy($id)
     {
-        $win = WinModel::findOrFail($id); // Find the win record by ID
+        $win = WinModel::findOrFail($id);
 
         // Insert the deleted record into win_history
         DB::table('win_history')->insert([
@@ -115,75 +119,69 @@ class WinController extends Controller
             'is_win' => $win->is_win,
             'risk' => $win->risk,
             'risk_reward_ratio' => $win->risk_reward_ratio,
-            'hour_session' => $win->hour_session, // Correctly reference hour_session from the $win object
+            'hour_session' => $win->hour_session,
             'created_at' => $win->created_at,
-            'deleted_at' => now(), // Log the deletion timestamp
+            'deleted_at' => now(),
         ]);
 
-        $win->delete(); // Delete the original win record
+        $win->delete();
 
-        return redirect()->route('app.index')->with('success', 'Record deleted successfully.'); // Redirect with success message
+        return redirect()->route('app.index')->with('success', 'Record deleted successfully.');
     }
-    
+
+    // Dashboard view
     public function dashboard()
     {
-        $wins = WinModel::all(); // Fetch all wins for the dashboard
-
+        // Only get the wins related to the authenticated user
+        $wins = WinModel::where('user_id', Auth::id())->get();
         $breadcrumbs = [
             ['name' => 'Home', 'url' => route('app.index')],
-            ['name' => 'Dashboard', 'url' => ''] // No trade ID here
+            ['name' => 'Dashboard', 'url' => '']
         ];
 
         return view('dashboard.dashboard', compact('wins', 'breadcrumbs'));
     }
-    
+
+    // Show a specific win record
     public function show($id)
     {
-        // Fetch the trade details
         $win = WinModel::findOrFail($id);
+        $breadcrumbs = [
+            ['name' => 'Home', 'url' => route('app.index')],
+        ];
 
-        // Initialize breadcrumbs
-        $breadcrumbs = [];
-
-        // Add Home breadcrumb
-        $breadcrumbs[] = ['name' => 'Home', 'url' => route('app.index')];
-
-        // Add Dashboard breadcrumb
         if (session('previous_route') === 'dashboard') {
             $breadcrumbs[] = ['name' => 'Dashboard', 'url' => route('dashboard')];
         }
 
-        // Add current trade
-        $currentRoute = ['name' => 'Trade ' . $win->id, 'url' => route('dashboard.show', ['id' => $win->id])];
-        $breadcrumbs[] = $currentRoute;
+        $breadcrumbs[] = ['name' => 'Trade ' . $win->id, 'url' => route('dashboard.show', ['id' => $win->id])];
 
-        // Save the current route in session for navigation
         session(['previous_route' => request('from')]);
 
-        // Return the view with the win details and breadcrumbs
         return view('dashboard.show', compact('win', 'breadcrumbs'));
     }
-            public function edit($id)
-        {
-            $win = WinModel::findOrFail($id); // Fetch the specific win record
-            return view('dashboard.edit', compact('win')); // Render the edit view with the win record
-        }
 
-        public function update(Request $request, $id)
-        {
-            // Validate the request data
-            $data = $request->validate([
-                'description' => 'required|string|max:255',
-                'is_win' => 'required|boolean',
-                'risk' => 'required|numeric|min:0',
-                'risk_reward_ratio' => 'required|numeric|min:0',
-                'hour_session' => 'required|string|max:50',
-            ]);
+    // Edit a specific win record
+    public function edit($id)
+    {
+        $win = WinModel::findOrFail($id);
+        return view('dashboard.edit', compact('win'));
+    }
 
-            // Update the win record
-            $win = WinModel::findOrFail($id);
-            $win->update($data);
+    // Update a win record
+    public function update(Request $request, $id)
+    {
+        $data = $request->validate([
+            'description' => 'required|string|max:255',
+            'is_win' => 'required|boolean',
+            'risk' => 'required|numeric|min:0',
+            'risk_reward_ratio' => 'required|numeric|min:0',
+            'hour_session' => 'required|string|max:50',
+        ]);
 
-            return redirect()->route('app.index')->with('success', 'Trade updated successfully.');
-        }
+        $win = WinModel::findOrFail($id);
+        $win->update($data);
+
+        return redirect()->route('app.index')->with('success', 'Trade updated successfully.');
+    }
 }

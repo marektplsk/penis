@@ -21,10 +21,11 @@ class WinModel extends Model
         'created_at',
         'updated_at',
         'hour_session',
+        'user_id',
     ];
 
     // Optionally, you can define timestamps if you're using custom columns
 
-    
+
     public $timestamps = true;
 }
