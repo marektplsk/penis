@@ -1,36 +1,33 @@
 <?php
 
-namespace App\Http\Controllers;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use App\Models\Portfolio; // Ensure this matches the model class name
-use Illuminate\Http\Request;
-
-class PortfolioController extends Controller
+class CreatePortofloiosTable extends Migration
 {
-    // Display a listing of portfolios
-    public function index()
-    {
-        $portfolios = Portfolio::all(); // Retrieve all portfolios
-        return view('portfolio.portfolio', compact('portfolios'));
-    }
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+{
+    Schema::create('portfolios', function (Blueprint $table) {
+        $table->id();
+        $table->decimal('amount', 15, 2); // Assuming amount is a decimal value
+        $table->string('type', 255); // Assuming type is a string with a max length of 255
+        $table->timestamps();
+    });
+}
 
-    // Store a newly created portfolio
-    public function store(Request $request)
-    {
-        // Validate incoming request data
-        $request->validate([
-            'amount' => 'required|numeric',
-            'type' => 'required|string|max:255',
-        ]);
-
-        // Create a new portfolio entry
-        Portfolio::create([
-            'amount' => $request->amount,
-            'type' => $request->type,
-        ]);
-
-        // Redirect back to the portfolio page
-        return redirect()->route('portfolio.index')->with('success', 'Portfolio item added successfully.');
-    }
-    
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+{
+    Schema::dropIfExists('portfolios');
+}
 }

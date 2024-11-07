@@ -28,8 +28,10 @@ class SearchController extends Controller
         // Add hardcoded container titles for the search
         $containerTitles = [
             'Dashboard' => route('dashboard'), // Change this to your actual dashboard route
-            'Wins List' => route('wins.index'), // Change this to your actual wins list route
+            'Home' => route('wins.index'), // Change this to your actual wins list route
             'Portfolio' => route('portfolio.index'), // Add the portfolio route
+            'Login' => route('login'), // Add the login route
+            'Register' => route('register'), // Add the register route
         ];
 
         // Check against container titles

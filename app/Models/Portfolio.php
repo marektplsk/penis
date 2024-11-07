@@ -7,4 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Portfolio extends Model
 {
     protected $fillable = ['amount', 'type'];
+
+    protected $table = 'portfolios';
 }
