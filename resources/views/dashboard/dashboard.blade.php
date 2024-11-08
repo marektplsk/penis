@@ -53,26 +53,31 @@
         <table class="min-w-full bg-white border border-gray-300 mt-8">
             <thead>
                 <tr>
-                    <th class="border px-4 py-2">Description</th>
+                    <th class="border px-4 py-2">Name</th>
                     <th class="border px-4 py-2">Result</th>
                     <th class="border px-4 py-2">Risk</th>
                     <th class="border px-4 py-2">Risk Reward Ratio</th>
                     <th class="border px-4 py-2">Session</th>
+                    <th class="border px-4 py-2">Data</th> <!-- Add this line -->
+                    <th class="border px-4 py-2">Trade Type</th> <!-- Add this line -->
                     <th class="border px-4 py-2">Created At</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($wins as $win)
-                    <tr class="hover:bg-gray-100 cursor-pointer" onclick="window.location='{{ route('dashboard.show', ['id' => $win->id, 'from' => 'dashboard']) }}'">
-                        <td class="border px-4 py-2">{{ $win->description }}</td>
-                        <td class="border px-4 py-2">{{ $win->is_win ? 'Win' : 'Loss' }}</td>
-                        <td class="border px-4 py-2">{{ $win->risk }}</td>
-                        <td class="border px-4 py-2">{{ $win->risk_reward_ratio }}</td>
-                        <td class="border px-4 py-2">{{ $win->hour_session }}</td>
-                        <td class="border px-4 py-2">{{ $win->created_at }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
+            @foreach ($wins as $win)
+                <tr class="hover:bg-gray-100 cursor-pointer" onclick="window.location='{{ route('dashboard.show', ['id' => $win->id, 'from' => 'dashboard']) }}'">
+                    <td class="border px-4 py-2">{{ $win->description }}</td>
+                    <td class="border px-4 py-2">{{ $win->is_win ? 'Win' : 'Loss' }}</td>
+                    <td class="border px-4 py-2">{{ $win->risk }}</td>
+                    <td class="border px-4 py-2">{{ $win->risk_reward_ratio }}</td>
+                    <td class="border px-4 py-2">{{ $win->hour_session }}</td>
+                    <td class="border px-4 py-2">{{ $win->data }}</td> <!-- Add this line -->
+                    <td class="border px-4 py-2">{{ $win->trade_type }}</td> <!-- Add this line -->
+                    <td class="border px-4 py-2">{{ $win->tags }}</td>
+                    <td class="border px-4 py-2">{{ $win->created_at }}</td>
+                    <td class="border px-4 py-2">{{ $win->tags }}</td>
+                </tr>
+            @endforeach
         </table>
 
         <!-- Include the search bar -->

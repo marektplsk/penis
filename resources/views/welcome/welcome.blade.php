@@ -47,15 +47,21 @@
 
 <!-- Main welcome container -->
 <div class="relative z-10 text-center p-8 text-white fadeIn">
-    <h1 class="text-5xl font-bold mb-4">Welcome to Our Awesome App!</h1>
+    <h1 class="text-5xl font-bold mb-4">Welcome to Our NIGGER App!</h1>
     <p class="text-lg text-gray-300 mb-8">Your journey begins here. Experience the best we have to offer.</p>
     <a href="{{ route('register') }}" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-full bounce transition-all duration-300">Get Started</a>
     <a href="{{ route('login') }}" class="bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2 px-6 rounded-full transition-all duration-300">Login</a>
 
+
+    <h3 class="text-2xl font-bold mb-4">
+        Dorobit-> lepsie name, potom dat desription a nasledne dat tam tiez aj nejaky fade, nasledne dat tam ze chyby a nasledne spravit chart na chyby :D
+    </h3>
+
+    <h1>kokOOOOOT</h1>
 </div>
 <!-- Footer -->
 <footer class="absolute bottom-4 w-full text-center text-gray-400 text-sm">
-    <p>&copy; {{ date('Y') }} OurApp. All rights reserved.</p>
+    <p>&copy; {{ date('Y,M,D,H') }} OurApp. All rights reserved.</p>
 </footer>
 
 </body>

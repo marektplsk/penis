@@ -16,6 +16,7 @@ class CreateWinHistoryTable extends Migration
             $table->decimal('risk_reward_ratio', 10, 2); // Field for risk/reward ratio
             $table->timestamp('created_at')->nullable(); // Original creation timestamp
             $table->timestamp('deleted_at')->nullable(); // Timestamp for when the record was deleted
+            $table->string('data'); // Field for the data
         });
     }
 

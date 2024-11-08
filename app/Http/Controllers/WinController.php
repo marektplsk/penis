@@ -6,6 +6,8 @@ use App\Models\WinModel;
 use Illuminate\Support\Facades\DB;
 use App\Models\Portfolio;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Tag; // Add a Tag model if you don't have one yet
+
 
 class WinController extends Controller
 {
@@ -64,6 +66,13 @@ class WinController extends Controller
             'risk' => 'required|numeric|min:0',
             'risk_reward_ratio' => 'required|numeric|min:0',
             'hour_session' => 'required|string|max:50',
+            'user_id' => Auth::id(),
+            'data' => 'required|string|max:255',
+            'trade_type' => 'required|string|in:short,long',
+
+
+
+
         ]);
 
         // Check if the user is authenticated
@@ -76,6 +85,8 @@ class WinController extends Controller
                 'risk_reward_ratio' => $data['risk_reward_ratio'],
                 'hour_session' => $data['hour_session'],
                 'user_id' => Auth::id(), // Add user_id explicitly
+                'data' => $data['data'],
+                'trade_type' => $data['trade_type'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -181,12 +192,32 @@ class WinController extends Controller
             'is_win' => 'required|boolean',
             'risk' => 'required|numeric|min:0',
             'risk_reward_ratio' => 'required|numeric|min:0',
-            'hour_session' => 'required|string|max:50',
+            'hour_session' => 'required|string|max:50','data' => 'required|string|max:255', // Add this line
+            'trade_type' => 'required|string|in:short,long',
+
         ]);
 
         $win = WinModel::findOrFail($id);
         $win->update($data);
 
         return redirect()->route('app.index')->with('success', 'Trade updated successfully.');
+    }
+
+    public function getTags()
+    {
+        // Fetch all tags and return as JSON
+        $tags = Tag::all(['id', 'name']); // Ensure you have a 'Tag' model with 'id' and 'name' fields
+        return response()->json($tags);
+    }
+    public function deleteTag($id)
+    {
+        try {
+            $tag = Tag::findOrFail($id);
+            $tag->delete();
+
+            return response()->json(['success' => true, 'message' => 'Tag deleted successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Tag deletion failed.'], 500);
+        }
     }
 }

@@ -87,3 +87,7 @@ Route::post('/logout', function () {
 Route::get('/loginWelcome', function () {
     return view('welcome.loginWelcome');
 })->name('loginWelcome');
+
+
+Route::get('/tags', [WinController::class, 'getTags']); // Route to fetch tags
+Route::delete('/tags/{id}', [WinController::class, 'deleteTag']); // Route to delete a tag

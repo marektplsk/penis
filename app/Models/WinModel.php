@@ -23,6 +23,10 @@ class WinModel extends Model
         'hour_session',
         'portfolio_id',
         'user_id',
+        'data',
+        'trade_type',
+        'tags',
+
     ];
 
     // Optionally, you can define timestamps if you're using custom columns
