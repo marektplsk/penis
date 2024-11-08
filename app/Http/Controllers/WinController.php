@@ -36,14 +36,19 @@ class WinController extends Controller
             ['name' => 'Home', 'url' => ''],
         ];
 
-        // Fetch portfolio data
-        $portfolios = Portfolio::all();
-        if ($portfolios->isEmpty()) {
+        // Fetch portfolio data only if the user is authenticated
+        if (Auth::check()) {
+            $portfolios = Portfolio::where('user_id', Auth::id())->get();
+            if ($portfolios->isEmpty()) {
+                $portfolioLabels = [];
+                $portfolioValues = [];
+            } else {
+                $portfolioLabels = $portfolios->pluck('type')->toArray();
+                $portfolioValues = $portfolios->pluck('amount')->toArray();
+            }
+        } else {
             $portfolioLabels = [];
             $portfolioValues = [];
-        } else {
-            $portfolioLabels = $portfolios->pluck('type')->toArray();
-            $portfolioValues = $portfolios->pluck('amount')->toArray();
         }
 
         return view('app', compact('wins', 'chartData', 'sessionData', 'breadcrumbs', 'portfolioLabels', 'portfolioValues'));

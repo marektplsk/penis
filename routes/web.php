@@ -2,9 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WinController;
-use App\Http\Controllers\SearchController; 
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\PortfolioController;
-use App\Http\Controllers\AuthController; 
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Auth;
 
 // Redirect root URL to the app index
@@ -37,6 +37,9 @@ Route::delete('/portfolio/{id}', [PortfolioController::class, 'destroy'])->name(
 Route::resource('portfolio', PortfolioController::class)->only(['index', 'store', 'destroy', 'edit', 'update']);
 
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('/portfolio', [PortfolioController::class, 'index'])->name('portfolio.index');
+});
 
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');

@@ -21,6 +21,7 @@ class WinModel extends Model
         'created_at',
         'updated_at',
         'hour_session',
+        'portfolio_id',
         'user_id',
     ];
 
