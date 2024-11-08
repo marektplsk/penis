@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User; // Import the User model
+use Illuminate\Support\Facades\Cookie;
 
 class AuthController extends Controller
 {
@@ -63,6 +64,7 @@ class AuthController extends Controller
         auth()->login($user);
 
         // Redirect to the named route for /app after registration
+        Cookie::queue('was_logged_in', true, 60); // expires in 60 minutes
         return redirect()->route('app.index')->with('success', 'Registration successful! You are now logged in.');
     }
 
@@ -84,6 +86,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($request->only('email', 'password'), $remember)) {
             // Redirect to the named route for /app after successful login
+            Cookie::queue('was_logged_in', true, 60);
             return redirect()->route('app.index')->with('success', 'You are logged in.');
         }
 

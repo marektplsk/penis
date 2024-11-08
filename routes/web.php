@@ -6,9 +6,17 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 
 // Redirect root URL to the app index
-Route::get('/', function () {
+Route::get('/', function() {
+    if(Cookie::get('was_logged_in')) {
+        return redirect()->route('loginWelcome');
+    }
+    return redirect()->route('welcome');
+});
+
+Route::get('/welcome', function () {
     return view('welcome.welcome');
 })->name('welcome');
 
@@ -56,12 +64,19 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/update', [AuthController::class, 'updateProfile'])->name('profile.update');
 });
 
+
+
 Route::post('/logout', function () {
     Auth::logout();
-    return redirect('/')->with('success', 'Successfully logged out.');
+    return redirect()->route('loginWelcome')->with('success', 'Successfully logged out.');
 })->name('logout');
 
-Route::get('/welcome', function () {
-    return view('welcome.welcome');
-})->name('welcome');
+Route::get('/loginWelcome', function () {
+    return view('welcome.loginWelcome');
+})->name('loginWelcome');
 
+
+
+Route::get('/loginWelcome', function () {
+    return view('welcome.loginWelcome');
+})->name('loginWelcome');
