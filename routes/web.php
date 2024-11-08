@@ -21,13 +21,25 @@ Route::get('/welcome', function () {
     return view('welcome.welcome');
 })->name('welcome');
 
-// Define the app index route with authentication check
+// Define the app index route with authentication and `was_logged_in` cookie check
 Route::get('/app', function () {
-    if (!Auth::check()) {
-        return redirect()->route('loginWelcome');
+    // Check if the user is logged in
+    if (Auth::check()) {
+        return app(WinController::class)->index(); // Allow access to /app
     }
-    return app(WinController::class)->index();
+
+    // If not logged in, check if the `was_logged_in` cookie is set to true
+    if (Cookie::get('was_logged_in')) {
+        return redirect()->route('loginWelcome'); // Redirect to loginWelcome if cookie is true
+    } else {
+        return redirect()->route('registerWelcome'); // Redirect to registerWelcome if cookie is false or missing
+    }
 })->name('app.index');
+
+// Define the registerWelcome route
+Route::get('/registerWelcome', function () {
+    return view('welcome.registerWelcome');
+})->name('registerWelcome');
 
 Route::post('/app', [WinController::class, 'store'])->name('app.store');
 
@@ -75,4 +87,3 @@ Route::post('/logout', function () {
 Route::get('/loginWelcome', function () {
     return view('welcome.loginWelcome');
 })->name('loginWelcome');
-
