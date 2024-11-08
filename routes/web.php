@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Auth;
 
 // Redirect root URL to the app index
 Route::get('/', function () {
-    return redirect()->route('app.index'); // Redirect to the app.index route
-});
+    return view('welcome.welcome');
+})->name('welcome');
 
 // Define the app index route
 Route::get('/app', [WinController::class, 'index'])->name('app.index');
@@ -60,3 +60,8 @@ Route::post('/logout', function () {
     Auth::logout();
     return redirect('/')->with('success', 'Successfully logged out.');
 })->name('logout');
+
+Route::get('/welcome', function () {
+    return view('welcome.welcome');
+})->name('welcome');
+

@@ -26,17 +26,14 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255',
         ]);
 
         $user = Auth::user();
         $user->name = $request->name;
-        $user->email = $request->email;
         $user->save();
 
         return redirect()->route('profile.show')->with('success', 'Profile updated successfully.');
     }
-
     public function showRegistrationForm()
     {
         return view('auth.register'); // Make sure you have a view file for registration
@@ -62,10 +59,11 @@ class AuthController extends Controller
             'password' => bcrypt($request->password),
         ]);
 
-        // Optionally, log the user in
+        // Optionally, log the user in automatically after registration
         auth()->login($user);
 
-        return redirect()->route('dashboard')->with('success', 'Registration successful! You are now logged in.');
+        // Redirect to the named route for /app after registration
+        return redirect()->route('app.index')->with('success', 'Registration successful! You are now logged in.');
     }
 
     public function showLoginForm()
@@ -81,9 +79,12 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        if (Auth::attempt($request->only('email', 'password'))) {
-            // Redirect to the intended page or dashboard
-            return redirect()->route('dashboard')->with('success', 'You are logged in.');
+        // Use "remember" checkbox if provided
+        $remember = $request->has('remember');
+
+        if (Auth::attempt($request->only('email', 'password'), $remember)) {
+            // Redirect to the named route for /app after successful login
+            return redirect()->route('app.index')->with('success', 'You are logged in.');
         }
 
         return redirect()->back()->withErrors(['email' => 'Invalid credentials'])->withInput();

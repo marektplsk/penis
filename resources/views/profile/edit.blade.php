@@ -18,7 +18,7 @@
         <form action="{{ route('profile.update') }}" method="POST" class="space-y-4">
             @csrf
             <input type="text" name="name" value="{{ old('name', $user->name) }}" placeholder="Name" class="border rounded p-2 w-full" required>
-            <input type="email" name="email" value="{{ old('email', $user->email) }}" placeholder="Email" class="border rounded p-2 w-full" required>
+            <input type="email" name="email" value="{{ old('email', $user->email) }}" placeholder="Email" class="border rounded p-2 w-full" disabled>
             <!-- Include other fields you want to edit here -->
 
             <button type="submit" class="bg-blue-500 text-white rounded p-2 w-full">Update Profile</button>
