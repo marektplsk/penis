@@ -25,6 +25,7 @@ class WinModel extends Model
         'user_id',
         'data',
         'trade_type',
+        'tags',
 
     ];
 

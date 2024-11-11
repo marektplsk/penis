@@ -65,6 +65,8 @@ class WinController extends Controller
             'risk_reward_ratio' => 'required|numeric|min:0',
             'data' => 'required|string|max:255',
             'trade_type' => 'required|string|in:short,long',
+            'tags' => 'array',
+            'tags.*' => 'string|max:255',
             'hour_session' => 'required|string|max:50',
         ]);
 
@@ -80,10 +82,16 @@ class WinController extends Controller
                 'user_id' => Auth::id(), // Add user_id explicitly
                 'data' => $data['data'],
                 'trade_type' => $data['trade_type'],
+                'tags' => json_encode($data['tags']),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
 
+            if (!empty($data['tags'])) {
+                foreach ($data['tags'] as $tag) {
+                    Tag::firstOrCreate(['name' => $tag]);
+                }
+            }
             // Redirect to the index page after storing
             return redirect()->route('app.index');
         } else {
@@ -188,6 +196,9 @@ class WinController extends Controller
             'hour_session' => 'required|string|max:50',
             'data' => 'required|string|max:255',
             'trade_type' => 'required|string|in:short,long',
+            'tags' => 'nullable|array',
+            'tags.*' => 'string|max:255',
+
 
 
         ]);

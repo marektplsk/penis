@@ -24,11 +24,52 @@
             <option value="long">Long</option>
         </select>
 
-
-
+        <input type="text" id="tag-input" placeholder="Add tags" class="border rounded p-2 w-full">
+        <div id="tags-container" class="mt-2"></div>
         <input type="hidden" name="tags" id="tags" value="">
+
         <button type="submit" class="bg-blue-500 text-white rounded p-2 w-full">Submit</button>
     </form>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tagInput = document.getElementById('tag-input');
+        const tagsContainer = document.getElementById('tags-container');
+        const tagsInput = document.getElementById('tags');
+        let tags = [];
+
+        tagInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const tag = tagInput.value.trim();
+                if (tag && !tags.includes(tag)) {
+                    tags.push(tag);
+                    updateTags();
+                }
+                tagInput.value = '';
+            }
+        });
+
+        function updateTags() {
+            tagsContainer.innerHTML = '';
+            tags.forEach(tag => {
+                const tagElement = document.createElement('span');
+                tagElement.className = 'inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2';
+                tagElement.textContent = tag;
+                tagsContainer.appendChild(tagElement);
+            });
+            tagsInput.value = JSON.stringify(tags);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('/tags')
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the fetched tags data
+                    console.log(data);
+                });
+        });
+    });
+</script>
 
