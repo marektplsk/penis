@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\Models\WinModel;
 use Illuminate\Support\Facades\DB;
 use App\Models\Portfolio;
+use App\Models\Tag;
 use Illuminate\Support\Facades\Auth;
 
 class WinController extends Controller
@@ -71,7 +72,7 @@ class WinController extends Controller
         ]);
 
         // Check if the user is authenticated
-        if (Auth::check()) {
+//        if (Auth::check()) {
             // Create a new win record including user_id
             WinModel::create([
                 'description' => $data['description'],
@@ -82,7 +83,7 @@ class WinController extends Controller
                 'user_id' => Auth::id(), // Add user_id explicitly
                 'data' => $data['data'],
                 'trade_type' => $data['trade_type'],
-                'tags' => json_encode($data['tags']),
+                'tags' => json_encode($data['tags'], true),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -94,10 +95,10 @@ class WinController extends Controller
             }
             // Redirect to the index page after storing
             return redirect()->route('app.index');
-        } else {
-            // Handle the case when the user is not authenticated
-            return redirect()->route('login')->withErrors('You must be logged in to create a win record.');
-        }
+//        } else {
+//            // Handle the case when the user is not authenticated
+//            return redirect()->route('login')->withErrors('You must be logged in to create a win record.');
+//        }
     }
 
     // Calculate win and loss points for chart data

@@ -14,6 +14,7 @@ class CreateWinsTable extends Migration
             $table->boolean('is_win'); // Boolean column for win/loss status
             $table->decimal('risk', 8, 2); // Column for risk value
             $table->decimal('risk_reward_ratio', 8, 2); // Column for risk/reward ratio
+            $table->string('tags'); // Column for tags
             $table->timestamps(); // Created and updated timestamps
         });
     }
