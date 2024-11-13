@@ -43,25 +43,34 @@ Route::get('/registerWelcome', function () {
 
 Route::post('/app', [WinController::class, 'store'])->name('app.store');
 
-// Use resource routing for wins, which includes index, create, store, show, edit, update, destroy
 Route::resource('wins', WinController::class);
 
 // Dashboard routes
 Route::get('/dashboard', [WinController::class, 'dashboard'])->name('dashboard');
+
+// Primary route for showing a specific win record in the dashboard context
 Route::get('/dashboard/{id}', [WinController::class, 'show'])->name('dashboard.show');
-Route::get('/wins/{id}', [WinController::class, 'show'])->name('dashboard.show');
-Route::get('/dashboard/wins/{id}', [WinController::class, 'show'])->name('dashboard.show');
-Route::get('/dashboard/wins/{id}/edit', [WinController::class, 'edit'])->name('dashboard.edit');
-Route::put('/dashboard/wins/{id}', [WinController::class, 'update'])->name('dashboard.update');
+
+// Alternative dashboard route for showing a win (if required separately)
+Route::get('/dashboard/wins/{id}', [WinController::class, 'show'])->name('dashboard.wins.show');
+
+Route::get('/dashboard/{id}/edit', [WinController::class, 'edit'])->name('dashboard.edit');
+
+Route::put('dashboard/{id}', [WinController::class, 'update'])->name('wins.update');
+
+
+
+
 
 // Search route
 Route::get('/search', [SearchController::class, 'search'])->name('search');
 
 // Portfolio routes
+// Portfolio routes
 Route::get('/portfolio', [PortfolioController::class, 'index'])->name('portfolio.index');
 Route::post('/portfolio', [PortfolioController::class, 'store'])->name('portfolio.store');
-Route::delete('/portfolio/{id}', [PortfolioController::class, 'destroy'])->name('portfolio.destroy');
 Route::resource('portfolio', PortfolioController::class)->only(['index', 'store', 'destroy', 'edit', 'update']);
+
 
 // Authentication routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -79,6 +88,7 @@ Route::middleware('auth')->group(function () {
 
 // Custom logout route redirecting to loginWelcome
 Route::post('/logout', function () {
+
     Auth::logout();
     return redirect()->route('loginWelcome')->with('success', 'Successfully logged out.');
 })->name('logout');
@@ -90,3 +100,4 @@ Route::get('/loginWelcome', function () {
 
 Route::get('/tags', [WinController::class, 'getTags']);
 Route::post('/tags', [WinController::class, 'storeTag']);
+

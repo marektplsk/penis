@@ -86,7 +86,7 @@ class WinController extends Controller
                 'user_id' => Auth::id(), // Add user_id explicitly
                 'data' => $data['data'],
                 'trade_type' => $data['trade_type'],
-                'tags' => json_encode($tags), // Ensure tags are handled correctly
+                'tags' => json_encode($tags), // Save tags as a JSON string
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -97,7 +97,9 @@ class WinController extends Controller
                 }
             }
 
-            \Log::info('Win created successfully', ['win' => $win]);
+
+
+            Log::info('Win created successfully', ['win' => $win]);
 
             // Redirect to the index page after storing
             return redirect()->route('app.index');
@@ -192,7 +194,7 @@ class WinController extends Controller
         return view('dashboard.edit', compact('win'));
     }
 
-    // Update a win record
+    // Update a win recordwe
     public function update(Request $request, $id)
     {
         $data = $request->validate([
@@ -213,7 +215,7 @@ class WinController extends Controller
         $win = WinModel::findOrFail($id);
         $win->update($data);
 
-        return redirect()->route('app.index')->with('success', 'Trade updated successfully.');
+        return redirect()->route('dashboard.show', $win->id)->with('success', 'Trade updated successfully.');
     }
 
     public function getTags()
@@ -228,8 +230,11 @@ class WinController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
-        $tag = Tag::firstOrCreate(['name' => $request->name]);
+        // Save the tag to the database
+        DB::table('tags')->updateOrInsert(['name' => $request->name]);
 
-        return response()->json(['success' => true, 'tag' => $tag]);
+        return response()->json(['success' => true, 'tag' => $request->name]);
     }
+
+
 }

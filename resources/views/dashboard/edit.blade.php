@@ -11,7 +11,7 @@
     <div class="container mx-auto p-4">
         <h1 class="text-2xl font-bold mb-4">Edit Trade</h1>
 
-        <form action="{{ route('dashboard.update', $win->id) }}" method="POST" class="space-y-4">
+        <form action="{{ route('dashboard.show', $win->id) }}" method="POST" class="space-y-4">
             @csrf
             @method('PUT')
             <input type="text" name="description" value="{{ $win->description }}" placeholder="Description" class="border rounded p-2 w-full" required>
@@ -33,6 +33,7 @@
                 <option value="long" {{ $win->trade_type == 'long' ? 'selected' : '' }}>Long</option>
             </select>
             <input type="text" name="tags[]" value="{{ implode(',', json_decode($win->tags, true) ?? []) }}" placeholder="Tags (comma separated)" class="border rounded p-2 w-full"> <!-- Add this line -->
+
             <button type="submit" class="bg-blue-500 text-white rounded p-2 w-full">Update</button>
         </form>
     </div>
