@@ -8,15 +8,19 @@ class AddTagsToWinsTable extends Migration
 {
     public function up()
     {
-        Schema::create('tags', function (Blueprint $table) {
-            $table->id();                        // Creates an auto-incrementing 'id' column as the primary key
-            $table->string('name')->unique();     // Creates a 'name' column that must be unique
-            $table->timestamps();                 // Creates 'created_at' and 'updated_at' timestamp columns
+        Schema::table('wins', function (Blueprint $table) {
+            if (!Schema::hasColumn('wins', 'tags')) {
+                $table->text('tags')->nullable(); // Add the tags column
+            }
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('tags');             // Drops the 'tags' table if it exists, rolling back the migration
+        Schema::table('wins', function (Blueprint $table) {
+            if (Schema::hasColumn('wins', 'tags')) {
+                $table->dropColumn('tags'); // Drop the tags column if it exists
+            }
+        });
     }
 }

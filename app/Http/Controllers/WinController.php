@@ -5,8 +5,9 @@ use Illuminate\Http\Request;
 use App\Models\WinModel;
 use Illuminate\Support\Facades\DB;
 use App\Models\Portfolio;
-use App\Models\Tag;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log; // Import the Log facade
+use App\Models\Tag;
 
 class WinController extends Controller
 {
@@ -66,15 +67,17 @@ class WinController extends Controller
             'risk_reward_ratio' => 'required|numeric|min:0',
             'data' => 'required|string|max:255',
             'trade_type' => 'required|string|in:short,long',
-            'tags' => 'array',
-            'tags.*' => 'string|max:255',
+            'tags' => 'nullable|string', // Validate tags as a JSON string
             'hour_session' => 'required|string|max:50',
         ]);
 
         // Check if the user is authenticated
-//        if (Auth::check()) {
+        if (Auth::check()) {
+            // Decode the tags JSON string
+            $tags = json_decode($data['tags'], true);
+
             // Create a new win record including user_id
-            WinModel::create([
+            $win = WinModel::create([
                 'description' => $data['description'],
                 'is_win' => $data['is_win'],
                 'risk' => $data['risk'],
@@ -83,22 +86,25 @@ class WinController extends Controller
                 'user_id' => Auth::id(), // Add user_id explicitly
                 'data' => $data['data'],
                 'trade_type' => $data['trade_type'],
-                'tags' => json_encode($data['tags'], true),
+                'tags' => json_encode($tags), // Ensure tags are handled correctly
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
 
-            if (!empty($data['tags'])) {
-                foreach ($data['tags'] as $tag) {
+            if (!empty($tags)) {
+                foreach ($tags as $tag) {
                     Tag::firstOrCreate(['name' => $tag]);
                 }
             }
+
+            \Log::info('Win created successfully', ['win' => $win]);
+
             // Redirect to the index page after storing
             return redirect()->route('app.index');
-//        } else {
-//            // Handle the case when the user is not authenticated
-//            return redirect()->route('login')->withErrors('You must be logged in to create a win record.');
-//        }
+        } else {
+            // Handle the case when the user is not authenticated
+            return redirect()->route('login')->withErrors('You must be logged in to create a win record.');
+        }
     }
 
     // Calculate win and loss points for chart data
@@ -208,5 +214,22 @@ class WinController extends Controller
         $win->update($data);
 
         return redirect()->route('app.index')->with('success', 'Trade updated successfully.');
+    }
+
+    public function getTags()
+    {
+        $tags = Tag::all();
+        return response()->json($tags);
+    }
+
+    public function storeTag(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $tag = Tag::firstOrCreate(['name' => $request->name]);
+
+        return response()->json(['success' => true, 'tag' => $tag]);
     }
 }

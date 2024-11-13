@@ -89,3 +89,4 @@ Route::get('/loginWelcome', function () {
 })->name('loginWelcome');
 
 Route::get('/tags', [WinController::class, 'getTags']);
+Route::post('/tags', [WinController::class, 'storeTag']);
