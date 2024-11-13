@@ -60,6 +60,7 @@
                     <th class="border px-4 py-2">Session</th>
                     <th class="border px-4 py-2">Data</th> <!-- Add this line -->
                     <th class="border px-4 py-2">Trade Type</th> <!-- Add this line -->
+                    <th class="border px-4 py-2">Tags</th>
                     <th class="border px-4 py-2">Created At</th>
                 </tr>
             </thead>
@@ -75,7 +76,6 @@
                     <td class="border px-4 py-2">{{ $win->trade_type }}</td> <!-- Add this line -->
                     <td class="border px-4 py-2">{{ $win->tags }}</td>
                     <td class="border px-4 py-2">{{ $win->created_at }}</td>
-                    <td class="border px-4 py-2">{{ $win->tags }}</td>
                 </tr>
             @endforeach
         </table>

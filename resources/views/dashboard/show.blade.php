@@ -19,7 +19,7 @@
     <p>Session: {{ $win->hour_session }}</p>
     <p><strong>Data:</strong> {{ $win->data }}</p>
     <p>Trade Type: {{ $win->trade_type }}</p>
-    <p>Tags: {{ implode(', ', json_decode($win->tags, true) ?? []) }}</p>
+    <p>Tags: {{ $win->tags }}</p>
 
     <!-- Edit Button with Pencil Icon -->
     <a href="{{ route('dashboard.edit', $win->id) }}" class="mt-4 px-4 py-2 bg-yellow-500 text-white rounded inline-flex items-center">

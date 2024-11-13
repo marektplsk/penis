@@ -27,7 +27,7 @@
                 <td class="border px-4 py-2">{{ $win->hour_session }}</td>
                 <td class="border px-4 py-2">{{ $win->data }}</td>
                 <td class="border px-4 py-2">{{ $win->trade_type }}</td>
-                <td class="border px-4 py-2">{{ implode(', ', json_decode($win->tags, true) ?? []) }}</td>
+                <td class="border px-4 py-2">{{ $win->tags }}</td>
                 <td class="border px-4 py-2">
                     <form action="{{ route('wins.destroy', $win->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this item?');" class="inline-block">
                         @csrf

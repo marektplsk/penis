@@ -1,4 +1,3 @@
-<!-- win_form.blade.php -->
 <div class="mt-8">
     <h2 class="text-2xl font-bold mb-4">Add Win/Loss</h2>
     <form action="{{ route('app.store') }}" method="POST" class="space-y-4">
@@ -26,10 +25,9 @@
 
         <div class="relative">
             <div class="flex items-center border rounded p-2 w-full" id="tag-input-container">
-                <input type="text" id="tag-input" placeholder="Add tags" class="flex-grow border-none focus:outline-none">
+                <input type="text" id="tag-input" name="tags" placeholder="Add tags" class="flex-grow border-none focus:outline-none">
             </div>
             <div id="tag-dropdown" class="absolute bg-white border rounded w-full mt-1 hidden"></div>
-            <input type="hidden" name="tags" id="tags" value="">
         </div>
 
         <button type="submit" class="bg-blue-500 text-white rounded p-2 w-full">Submit</button>
@@ -41,8 +39,6 @@
         const tagInput = document.getElementById('tag-input');
         const tagDropdown = document.getElementById('tag-dropdown');
         const tagInputContainer = document.getElementById('tag-input-container');
-        const tagsInput = document.getElementById('tags');
-        let tags = [];
         let allTags = [];
 
         // Fetch existing tags from the server
@@ -67,7 +63,7 @@
             if (e.key === 'Enter') {
                 e.preventDefault();
                 const tag = tagInput.value.trim();
-                if (tag && !tags.includes(tag)) {
+                if (tag) {
                     saveTag(tag);
                 }
                 tagInput.value = '';
@@ -94,37 +90,9 @@
                 .then(data => {
                     if (data.success) {
                         allTags.push(tag);
-                        addTag(tag);
                         updateDropdown(allTags);
                     }
                 });
-        }
-
-        function addTag(tag) {
-            tags.push(tag);
-            updateTags();
-        }
-
-        function updateTags() {
-            tagInputContainer.innerHTML = '';
-            tagInputContainer.appendChild(tagInput);
-            tags.forEach(tag => {
-                const tagElement = document.createElement('span');
-                tagElement.className = 'inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2';
-                tagElement.textContent = tag;
-
-                const deleteButton = document.createElement('button');
-                deleteButton.className = 'ml-2 text-red-500';
-                deleteButton.textContent = 'x';
-                deleteButton.addEventListener('click', function () {
-                    tags = tags.filter(t => t !== tag);
-                    updateTags();
-                });
-
-                tagElement.appendChild(deleteButton);
-                tagInputContainer.appendChild(tagElement);
-            });
-            tagsInput.value = JSON.stringify(tags);
         }
 
         function updateDropdown(tags) {
@@ -134,19 +102,8 @@
                 option.className = 'p-2 cursor-pointer hover:bg-gray-200 flex justify-between items-center';
                 option.textContent = tag;
 
-                const deleteButton = document.createElement('button');
-                deleteButton.className = 'ml-2 text-red-500';
-                deleteButton.textContent = 'x';
-                deleteButton.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                    allTags = allTags.filter(t => t !== tag);
-                    updateDropdown(allTags);
-                });
-
-                option.appendChild(deleteButton);
                 option.addEventListener('click', function () {
-                    addTag(tag);
-                    tagInput.value = '';
+                    tagInput.value = tag;
                     tagDropdown.classList.add('hidden');
                 });
                 tagDropdown.appendChild(option);

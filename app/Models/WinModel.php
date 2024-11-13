@@ -13,7 +13,7 @@ class WinModel extends Model
     protected $table = 'wins'; // Adjust if your table name is different
 
     // Define fillable properties
-    protected $fillable = [
+    public $fillable = [
         'description',
         'is_win',
         'risk',
@@ -33,11 +33,4 @@ class WinModel extends Model
 
 
     public $timestamps = true;
-
-    public function tags()
-    {
-        return $this->belongsToMany(Tag::class);
-    }
-
-
 }

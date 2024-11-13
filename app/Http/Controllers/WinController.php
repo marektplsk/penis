@@ -67,15 +67,12 @@ class WinController extends Controller
             'risk_reward_ratio' => 'required|numeric|min:0',
             'data' => 'required|string|max:255',
             'trade_type' => 'required|string|in:short,long',
-            'tags' => 'nullable|string', // Validate tags as a JSON string
+            'tags' => 'required|array|max:255', // Validate tags as a string
             'hour_session' => 'required|string|max:50',
         ]);
 
         // Check if the user is authenticated
         if (Auth::check()) {
-            // Decode the tags JSON string
-            $tags = json_decode($data['tags'], true);
-
             // Create a new win record including user_id
             $win = WinModel::create([
                 'description' => $data['description'],
@@ -85,19 +82,17 @@ class WinController extends Controller
                 'hour_session' => $data['hour_session'],
                 'user_id' => Auth::id(), // Add user_id explicitly
                 'data' => $data['data'],
+                'tags' => $data['tags'], // Ensure tags are not null
                 'trade_type' => $data['trade_type'],
-                'tags' => json_encode($tags), // Ensure tags are handled correctly
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
 
-            if (!empty($tags)) {
-                foreach ($tags as $tag) {
-                    Tag::firstOrCreate(['name' => $tag]);
-                }
+            if (!empty($data['tags'])) {
+                WinModel::firstOrCreate(['tags' => $data['tags']]);
             }
 
-            \Log::info('Win created successfully', ['win' => $win]);
+            Log::info('Win created successfully', ['win' => $win]);
 
             // Redirect to the index page after storing
             return redirect()->route('app.index');
