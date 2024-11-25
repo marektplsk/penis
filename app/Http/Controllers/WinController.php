@@ -62,6 +62,7 @@ class WinController extends Controller
         // Validate incoming request data
         $data = $request->validate([
             'description' => 'required|string|max:255',
+            'pair' => 'required|string|max:20', // Validate the pair field
             'is_win' => 'required|boolean',
             'risk' => 'required|numeric|min:0',
             'risk_reward_ratio' => 'required|numeric|min:0',
@@ -79,6 +80,7 @@ class WinController extends Controller
             // Create a new win record including user_id
             $win = WinModel::create([
                 'description' => $data['description'],
+                'pair' => $data['pair'], // Save the pair
                 'is_win' => $data['is_win'],
                 'risk' => $data['risk'],
                 'risk_reward_ratio' => $data['risk_reward_ratio'],
@@ -199,6 +201,7 @@ class WinController extends Controller
     {
         $data = $request->validate([
             'description' => 'required|string|max:255',
+            'pair' => 'required|string|max:20',
             'is_win' => 'required|boolean',
             'risk' => 'required|numeric|min:0',
             'risk_reward_ratio' => 'required|numeric|min:0',
@@ -235,6 +238,48 @@ class WinController extends Controller
 
         return response()->json(['success' => true, 'tag' => $request->name]);
     }
+
+    public function getUserTradeData($user)
+    {
+        $wins = WinModel::where('user_id', $user->id)->get();
+
+        // Calculate win rate
+        $winsCount = $wins->where('is_win', 1)->count();
+        $totalTrades = $wins->count();
+        $winRate = $totalTrades > 0 ? ($winsCount / $totalTrades) * 100 : 0;
+
+        // Analyze tag usage
+        $tagUsage = $wins->groupBy('tags');
+        $underUsedTags = [];
+        foreach ($tagUsage as $tag => $tagTrades) {
+            $tagWinRate = $tagTrades->where('is_win', 1)->count() / $tagTrades->count() * 100;
+            if ($tagWinRate > 50) {
+                $underUsedTags[] = ['tag' => $tag, 'winRate' => $tagWinRate];
+            }
+        }
+
+        // Session data
+        $sessions = $wins->groupBy('hour_session')->map->count();
+
+        // Extract emotional patterns from the 'data' field
+        $emotions = [];
+        foreach ($wins as $win) {
+            if (str_contains($win->data, 'stress')) {
+                $emotions[] = 'stressful';
+            }
+            if (str_contains($win->data, 'confidence')) {
+                $emotions[] = 'confident';
+            }
+        }
+
+        return [
+            'winRate' => $winRate,
+            'underUsedTags' => $underUsedTags,
+            'sessionData' => $sessions,
+            'emotions' => $emotions
+        ];
+    }
+
 
 
 }

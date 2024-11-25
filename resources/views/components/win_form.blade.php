@@ -4,6 +4,19 @@
     <form action="{{ route('app.store') }}" method="POST" class="space-y-4">
         @csrf
         <input type="text" name="description" placeholder="Name" class="border rounded p-2 w-full" required>
+        <div class="relative">
+            <input
+                type="text"
+                name="pair"
+                id="pair-input"
+                placeholder="Enter pair (e.g., XAUUSD)"
+                class="border rounded p-2 w-full"
+                autocomplete="off"
+                required
+            >
+            <div id="pair-dropdown" class="absolute bg-white border rounded w-full mt-1 hidden shadow-lg z-10"></div>
+        </div>
+
         <select name="is_win" class="border rounded p-2 w-full" required>
             <option value="1">Win</option>
             <option value="0">Loss</option>
@@ -153,11 +166,124 @@
             });
         }
     });
+///kokotkoooo
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const pairInput = document.getElementById('pair-input');
+        const pairDropdown = document.getElementById('pair-dropdown');
+        const pairs = ["Ym", "Es", "Nq", "XAUUSD", "EURUSD", "BTCUSDT"];
+
+        let autofilledValue = '';     // Track the autofilled part of the pair
+        let userTypedValue = '';      // Track the manually typed part of the pair
+
+        // Function to highlight the autofilled part in the input field
+        function highlightText(input, start, length) {
+            input.setSelectionRange(start, start + length);  // Highlight the matched part
+        }
+
+        // Handle user typing in the pair input field
+        pairInput.addEventListener('input', function () {
+            const query = pairInput.value.trim().toUpperCase();
+
+            // Filter pairs based on the query typed by the user
+            const filteredPairs = query
+                ? pairs.filter(pair => pair.toUpperCase().startsWith(query))
+                : pairs;
+
+            if (filteredPairs.length === 1 && filteredPairs[0].toUpperCase().startsWith(query)) {
+                autofilledValue = filteredPairs[0].substring(query.length);  // Capture the autofilled part
+                userTypedValue = query;  // Store the user typed part
+                pairInput.value = userTypedValue + autofilledValue;  // Update the input field
+                highlightText(pairInput, userTypedValue.length, autofilledValue.length);  // Highlight the autofilled part
+            } else {
+                autofilledValue = '';  // Reset autofilled part if no match
+            }
+
+            // Show the dropdown with filtered pairs
+            updatePairDropdown(filteredPairs);
+        });
+
+        // Handle key events for delete and backspace
+        pairInput.addEventListener('keydown', function (e) {
+            if (e.key === "Backspace" || e.key === "Delete") {
+                const currentLength = pairInput.value.length;
+
+                // If there is an autofilled part and the user presses backspace/delete, delete the autofilled part first
+                if (currentLength > userTypedValue.length && autofilledValue !== '') {
+                    autofilledValue = '';  // Remove the autofilled part
+                    pairInput.value = userTypedValue + autofilledValue;  // Update input field with remaining manually typed part
+                    highlightText(pairInput, userTypedValue.length, autofilledValue.length);  // Remove highlight
+                    e.preventDefault();  // Prevent default backspace to avoid deleting the user typed part prematurely
+                }
+                // If there is no autofilled part left, delete the manually typed part
+                else if (currentLength > 0) {
+                    userTypedValue = userTypedValue.slice(0, -1);  // Remove the last typed character
+                    pairInput.value = userTypedValue + autofilledValue;  // Update input field
+                    highlightText(pairInput, userTypedValue.length, autofilledValue.length);  // Update highlight
+                }
+            }
+        });
+
+        // Show dropdown when input is focused
+        pairInput.addEventListener('focus', function () {
+            const query = pairInput.value.trim().toUpperCase();
+            const filteredPairs = query
+                ? pairs.filter(pair => pair.toUpperCase().startsWith(query))
+                : pairs;
+            updatePairDropdown(filteredPairs);
+            pairDropdown.classList.remove('hidden');
+        });
+
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', function (e) {
+            if (!pairInput.contains(e.target) && !pairDropdown.contains(e.target)) {
+                pairDropdown.classList.add('hidden');
+            }
+        });
+
+        // Handle dropdown item selection
+        pairDropdown.addEventListener('click', function (e) {
+            if (e.target && e.target.dataset.pair) {
+                pairInput.value = e.target.dataset.pair;
+                autofilledValue = e.target.dataset.pair.substring(pairInput.value.length);  // Update autofilled part
+                userTypedValue = pairInput.value;
+                pairDropdown.classList.add('hidden');
+            }
+        });
+
+        // Update dropdown with filtered pairs
+        function updatePairDropdown(filteredPairs) {
+            pairDropdown.innerHTML = ''; // Clear existing options
+            if (filteredPairs.length === 0) {
+                pairDropdown.innerHTML = '<div class="p-2 text-gray-500">No matches</div>';
+                return;
+            }
+
+            filteredPairs.forEach(pair => {
+                const option = document.createElement('div');
+                option.className = 'p-2 cursor-pointer hover:bg-gray-200';
+                option.textContent = pair;
+                option.dataset.pair = pair;
+                pairDropdown.appendChild(option);
+            });
+
+            pairDropdown.classList.remove('hidden');
+        }
+    });
+
+
+
 </script>
 
 <style>
     #tag-input-container {
         display: flex;
         flex-wrap: nowrap;
+    }
+
+    #pair-dropdown, #tag-dropdown {
+        max-height: 150px;
+        overflow-y: auto;
     }
 </style>

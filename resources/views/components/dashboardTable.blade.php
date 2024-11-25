@@ -5,6 +5,7 @@
         <thead>
         <tr>
             <th class="border px-4 py-2">Name</th>
+            <th class="border px-4 py-2">Pair</th>
             <th class="border px-4 py-2">Result</th>
             <th class="border px-4 py-2">Risk</th>
             <th class="border px-4 py-2">Risk Reward Ratio</th>
@@ -20,6 +21,7 @@
         @foreach ($wins as $win)
             <tr class="cursor-pointer hover:bg-gray-100" onclick="window.location='{{ route('dashboard.show', $win->id) }}'">
                 <td class="border px-4 py-2">{{ $win->description }}</td>
+                <td class="border px-4 py-2">{{ $win->pair }}</td>
                 <td class="border px-4 py-2">{{ $win->is_win ? 'Win' : 'Loss' }}</td>
                 <td class="border px-4 py-2">{{ $win->risk }}</td>
                 <td class="border px-4 py-2">{{ $win->risk_reward_ratio }}</td>

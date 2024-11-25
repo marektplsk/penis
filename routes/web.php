@@ -7,6 +7,8 @@ use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
+use App\Http\Controllers\ChatController;
+
 
 // Redirect root URL to the app index
 Route::get('/', function() {
@@ -70,6 +72,8 @@ Route::get('/search', [SearchController::class, 'search'])->name('search');
 Route::get('/portfolio', [PortfolioController::class, 'index'])->name('portfolio.index');
 Route::post('/portfolio', [PortfolioController::class, 'store'])->name('portfolio.store');
 Route::resource('portfolio', PortfolioController::class)->only(['index', 'store', 'destroy', 'edit', 'update']);
+Route::delete('/portfolio/{id}', [PortfolioController::class, 'destroy'])->name('portfolio.destroy');
+
 
 
 // Authentication routes
@@ -100,4 +104,9 @@ Route::get('/loginWelcome', function () {
 
 Route::get('/tags', [WinController::class, 'getTags']);
 Route::post('/tags', [WinController::class, 'storeTag']);
+
+Route::get('/chat/generate-feedback', [ChatController::class, 'generateFeedback']);
+Route::post('/chat/send-message', [ChatController::class, 'sendMessage']);
+
+
 

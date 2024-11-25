@@ -12,6 +12,7 @@
     <h1 class="text-2xl font-bold mb-4">Win Details</h1>
 
     <p>Description: {{ $win->description }}</p>
+    <p>Pair: {{ $win->pair }}</p>
     <p>Result: {{ $win->is_win ? 'Win' : 'Loss' }}</p>
     <p>Risk: {{ $win->risk }}</p>
     <p>Risk Reward Ratio: {{ $win->risk_reward_ratio }}</p>
@@ -25,9 +26,10 @@
     <a href="{{ route('dashboard.edit', $win->id) }}" class="mt-4 px-4 py-2 bg-yellow-500 text-white rounded inline-flex items-center">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
             <path d="M17.414 2.586a2 2 0 010 2.828l-10 10A2 2 0 016.586 16H4a1 1 0 01-1-1v-2.586a2 2 0 01.586-1.414l10-10a2 2 0 012.828 0zM5 15h1.586L15 6.586 13.414 5 5 13.414V15z"/>
-        </svg>
+   </svg>
         Edit
     </a>
+    @include('search.searchbar')
 
     <div class="mt-8">
         @if(request('from') === 'dashboard')

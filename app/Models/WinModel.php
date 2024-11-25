@@ -15,6 +15,7 @@ class WinModel extends Model
     // Define fillable properties
     protected $fillable = [
         'description',
+        'pair',
         'is_win',
         'risk',
         'risk_reward_ratio',

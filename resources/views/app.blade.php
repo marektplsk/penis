@@ -31,32 +31,27 @@
         });
     </script>
 </head>
-<body class="flex">
-    @include('_inc.sidebar') <!-- Include the sidebar -->
+        <body class="flex">
+        @include('_inc.sidebar') <!-- Sidebar -->
 
-    <!-- Success message moved to the top -->
-    @if (session('success'))
-        <div id="success-message" class="bg-green-500 text-white p-4 rounded mb-4">
-            {{ session('success') }}
+        <!-- Include the AI feedback above the win form -->
+
+        <div class="flex-1 container mx-auto p-4">
+            @include('components.breadcrumbs', ['breadcrumbs' => $breadcrumbs])
+            @include('components.feedback')
+
+
+            @include('components.win_form')
+
+            <div class="mt-10"></div> <!-- 40 pixels space -->
+            @include('_inc.charts')
+            <div class="mt-10"></div> <!-- 40 pixels space -->
+
+            @include('components.dashboardTable', ['wins' => $wins]) <!-- Pass the $wins variable -->
+
+            @include('search.searchbar') <!-- Search bar -->
         </div>
-    @endif
 
-    <div class="flex-1 container mx-auto p-4">
-        @include('components.breadcrumbs', ['breadcrumbs' => $breadcrumbs]) <!-- Include breadcrumbs here -->
-
-        @include('components.win_form')
-
-        <div class="mt-10"></div> <!-- 40 pixels space -->
-        @include('_inc.charts')
-        <div class="mt-10"></div> <!-- 40 pixels space -->
-
-        @include('components.dashboardTable', ['wins' => $wins]) <!-- Pass the $wins variable -->
-
-        <!-- Include the search bar -->
-        @include('search.searchbar') <!-- Ensure the path to searchbar.blade.php is correct -->
-
-    </div>
-    
     <!-- Chart Scripts -->
     <script>
         // Sample data for Portfolio Chart
@@ -206,7 +201,7 @@ const portfolioChart = new Chart(
                     legend: {
                         position: 'top',
                     },
-                    
+
                 }
             }
         };
