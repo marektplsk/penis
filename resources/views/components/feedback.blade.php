@@ -15,31 +15,36 @@
                 return response.json();
             })
             .then(data => {
+                const feedbackContainer = document.getElementById('chat-feedback');
                 if (data.error) {
-                    document.getElementById('chat-feedback').innerHTML = <p class="text-red-500">${data.error}</p>;
+                    // Show error message if any
+                    feedbackContainer.innerHTML = `<p class="text-red-500">${data.error}</p>`;
                 } else {
-                    document.getElementById('chat-feedback').innerHTML = <p>${data}</p>;
+                    // Assuming the response contains the feedback as raw text
+                    typeWriter(data, feedbackContainer); // Adjusted to use data directly
                 }
             })
             .catch(error => {
-                document.getElementById('chat-feedback').innerHTML = <p class="text-red-500">Error: ${error.message}</p>;
+                const feedbackContainer = document.getElementById('chat-feedback');
+                feedbackContainer.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
             });
 
+        // Function to create typewriter effect
         function typeWriter(text, container, speed = 50) {
             let i = 0;
 
             const cursor = document.createElement('span');
             cursor.className = 'cursor';
             container.innerHTML = ''; // Clear existing content
-            container.appendChild(cursor);
+            container.appendChild(cursor); // Add cursor to the container
 
             const interval = setInterval(() => {
                 if (i < text.length) {
-                    cursor.insertAdjacentHTML('beforebegin', text.charAt(i));
+                    cursor.insertAdjacentHTML('beforebegin', text.charAt(i)); // Add character before the cursor
                     i++;
                 } else {
                     clearInterval(interval);
-                    cursor.remove(); // Remove cursor after animation
+                    cursor.remove(); // Remove cursor after animation finishes
                 }
             }, speed);
         }
